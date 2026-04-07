@@ -1,7 +1,15 @@
+
+using Microsoft.EntityFrameworkCore;
+using OARR20260406.AppSeguridadWeb.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Configurar la conexión a SQL Server
+builder.Services.AddDbContext<AppDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
