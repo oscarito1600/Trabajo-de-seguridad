@@ -1,6 +1,7 @@
 
-using Microsoft.EntityFrameworkCore;
 using OARR20260406.AppSeguridadWeb.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,19 @@ builder.Services.AddControllersWithViews();
 // Configurar la conexión a SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.Cookie.IsEssential = true;
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Usuarios/Login";
+    options.AccessDeniedPath = "/Usuarios/AccessDenied";
+    options.LogoutPath = "/Usuarios/Logout";
+});
 
 var app = builder.Build();
 
@@ -27,6 +41,9 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
